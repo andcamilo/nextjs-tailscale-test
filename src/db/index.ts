@@ -3,7 +3,7 @@ import postgres from 'postgres';
 import * as schema from './schema';
 
 const client = postgres({
-  host: process.env.DB_HOST || '104.198.231.32',
+  host: process.env.DB_HOST || '172.25.0.3',
   port: parseInt(process.env.DB_PORT || '5432'),
   database: process.env.DB_NAME || 'n8n_db',
   username: process.env.DB_USER || 'n8n_user',

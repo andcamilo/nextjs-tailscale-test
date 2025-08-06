@@ -5,7 +5,7 @@ export default {
   out: './drizzle',
   dialect: 'postgresql',
   dbCredentials: {
-    host: process.env.DB_HOST || '104.198.231.32',
+    host: process.env.DB_HOST || '172.25.0.3',
     port: parseInt(process.env.DB_PORT || '5432'),
     user: process.env.DB_USER || 'n8n_user',
     password: process.env.DB_PASSWORD || 'sg*?esXL}>z9wO4f',
