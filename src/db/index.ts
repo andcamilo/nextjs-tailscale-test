@@ -5,28 +5,13 @@ import * as schema from './schema';
 // Configuración para desarrollo vs producción
 const isProduction = process.env.NODE_ENV === 'production';
 
-// Configurar proxy HTTP para producción (Fixie)
-interface PostgresConfig {
-  host: string;
-  port: number;
-  database: string;
-  username: string;
-  password: string;
-  max: number;
-  ssl: boolean;
-  connection?: {
-    host: string;
-    port: number;
-  };
-  proxy?: {
-    host: string;
-    port: number;
-    username: string;
-    password: string;
-  };
+// En producción, configurar proxy HTTP para Fixie
+if (isProduction && process.env.FIXIE_URL) {
+  process.env.HTTP_PROXY = process.env.FIXIE_URL;
+  process.env.HTTPS_PROXY = process.env.FIXIE_URL;
 }
 
-let clientConfig: PostgresConfig = {
+const client = postgres({
   host: isProduction 
     ? (process.env.DB_HOST || '34.41.173.45')
     : (process.env.DB_HOST || '100.66.76.2'),
@@ -36,30 +21,6 @@ let clientConfig: PostgresConfig = {
   password: process.env.DB_PASSWORD || 'sg*?esXL}>z9wO4f',
   max: 1,
   ssl: false,
-};
-
-// En producción, configurar proxy HTTP para Fixie
-if (isProduction && process.env.FIXIE_URL) {
-  const proxyUrl = new URL(process.env.FIXIE_URL);
-  clientConfig = {
-    ...clientConfig,
-    connection: {
-      host: clientConfig.host,
-      port: clientConfig.port,
-    },
-    proxy: {
-      host: proxyUrl.hostname,
-      port: parseInt(proxyUrl.port || '80'),
-      username: proxyUrl.username,
-      password: proxyUrl.password,
-    }
-  };
-  
-  // Configurar variables de entorno para el cliente PostgreSQL
-  process.env.HTTP_PROXY = process.env.FIXIE_URL;
-  process.env.HTTPS_PROXY = process.env.FIXIE_URL;
-}
-
-const client = postgres(clientConfig);
+});
 
 export const db = drizzle(client, { schema });
