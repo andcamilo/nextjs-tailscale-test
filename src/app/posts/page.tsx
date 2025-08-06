@@ -81,7 +81,7 @@ export default function PostsPage() {
         const error = await response.json();
         setMessage(error.error || 'Failed to create post');
       }
-    } catch (error) {
+    } catch {
       setMessage('Failed to create post');
     } finally {
       setLoading(false);

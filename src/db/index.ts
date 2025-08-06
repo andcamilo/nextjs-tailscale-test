@@ -6,7 +6,7 @@ import * as schema from './schema';
 const isProduction = process.env.NODE_ENV === 'production';
 
 // Configurar proxy HTTP para producción (Fixie)
-let clientConfig: any = {
+let clientConfig: Record<string, any> = {
   host: isProduction 
     ? (process.env.DB_HOST || '34.41.173.45')
     : (process.env.DB_HOST || '100.66.76.2'),

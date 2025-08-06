@@ -45,7 +45,7 @@ export default function UsersPage() {
         const error = await response.json();
         setMessage(error.error || 'Failed to create user');
       }
-    } catch (error) {
+    } catch {
       setMessage('Failed to create user');
     } finally {
       setLoading(false);
