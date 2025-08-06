@@ -6,7 +6,27 @@ import * as schema from './schema';
 const isProduction = process.env.NODE_ENV === 'production';
 
 // Configurar proxy HTTP para producción (Fixie)
-let clientConfig: Record<string, any> = {
+interface PostgresConfig {
+  host: string;
+  port: number;
+  database: string;
+  username: string;
+  password: string;
+  max: number;
+  ssl: boolean;
+  connection?: {
+    host: string;
+    port: number;
+  };
+  proxy?: {
+    host: string;
+    port: number;
+    username: string;
+    password: string;
+  };
+}
+
+let clientConfig: PostgresConfig = {
   host: isProduction 
     ? (process.env.DB_HOST || '34.41.173.45')
     : (process.env.DB_HOST || '100.66.76.2'),
