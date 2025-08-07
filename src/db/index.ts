@@ -11,15 +11,13 @@ let pool: Pool;
 
 if (isVercel && isProduction) {
   // En Vercel producción: usar proxy SOCKS para BD externa
-  process.env.http_proxy = 'socks5://fixie:hwAXP1CEv6zp2P4@44.219.233.55:1080';
-  process.env.https_proxy = 'socks5://fixie:hwAXP1CEv6zp2P4@44.219.233.55:1080';
-
+  // NOTE: Use the new pgViaFixie helper instead for SOCKS connection
   pool = new Pool({
-    host: '34.41.173.45',
-    port: 5432,
-    database: 'n8n_db',
-    user: 'n8n_user',
-    password: 'sg*?esXL}>z9wO4f',
+    host: process.env.PG_HOST,
+    port: parseInt(process.env.PG_PORT || '5432'),
+    database: process.env.PG_DATABASE,
+    user: process.env.PG_USER,
+    password: process.env.PG_PASSWORD,
     max: 1,
     ssl: false,
     connectionTimeoutMillis: 60000,
@@ -28,11 +26,11 @@ if (isVercel && isProduction) {
 } else {
   // Desarrollo local sin proxy
   pool = new Pool({
-    host: process.env.DB_HOST || '100.66.76.2',
+    host: process.env.DB_HOST,
     port: parseInt(process.env.DB_PORT || '5432'),
-    database: process.env.DB_NAME || 'n8n_db',
-    user: process.env.DB_USER || 'n8n_user',
-    password: process.env.DB_PASSWORD || 'sg*?esXL}>z9wO4f',
+    database: process.env.DB_NAME,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
     max: 1,
     ssl: false,
   });

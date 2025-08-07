@@ -1,66 +1,36 @@
-import { Client } from 'pg';
+import { NextResponse } from 'next/server';
+import { connectPgViaFixie } from '@/lib/pgViaFixie';
+
+export const runtime = 'nodejs';   // asegura que NO sea Edge
 
 export async function GET() {
-  let client: Client | null = null;
-  
   try {
-    // Configurar proxy SOCKS para Vercel usando variables de entorno
-    const isVercel = !!process.env.VERCEL;
-    
-    if (isVercel) {
-      // En Vercel: configurar proxy SOCKS globalmente
-      process.env.http_proxy = 'socks5://fixie:hwAXP1CEv6zp2P4@44.219.233.55:1080';
-      process.env.https_proxy = 'socks5://fixie:hwAXP1CEv6zp2P4@44.219.233.55:1080';
-      
-      client = new Client({
+    const db = await connectPgViaFixie();
+    const { rows } = await db.query('SELECT version(), NOW() AS current_time');
+    await db.end();
+
+    return NextResponse.json({
+      success: true,
+      environment: process.env.VERCEL ? 'vercel' : 'local',
+      data: {
+        version: rows[0].version,
+        current_time: rows[0].current_time,
+      },
+      connection_info: {
         host: '34.41.173.45',
         port: 5432,
         database: 'n8n_db',
-        user: 'n8n_user',
-        password: 'sg*?esXL}>z9wO4f',
-        connectionTimeoutMillis: 60000,
-      });
-    } else {
-      // Local: conexión directa
-      client = new Client({
-        host: '100.66.76.2',
-        port: 5432,
-        database: 'n8n_db',
-        user: 'n8n_user',
-        password: 'sg*?esXL}>z9wO4f',
-      });
-    }
-
-    await client.connect();
-    
-    // Ejecutar query de prueba
-    const result = await client.query('SELECT version(), now() as current_time');
-    
-    await client.end();
-    
-    return Response.json({
-      success: true,
-      environment: isVercel ? 'vercel' : 'local',
-      data: result.rows[0],
-      connection_info: {
-        host: client.host,
-        port: client.port,
-        database: client.database
-      }
+        proxy: 'SOCKS5 via Fixie (century.usefixie.com:1080)',
+      },
     });
-    
-  } catch (error: unknown) {
-    if (client) {
-      try { await client.end(); } catch {}
-    }
-    
-    console.error('PostgreSQL connection error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    
-    return Response.json({
-      success: false,
-      error: errorMessage,
-      environment: !!process.env.VERCEL ? 'vercel' : 'local'
-    }, { status: 500 });
+  } catch (err: any) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: err.message ?? 'unknown',
+        environment: process.env.VERCEL ? 'vercel' : 'local',
+      },
+      { status: 500 },
+    );
   }
 }
