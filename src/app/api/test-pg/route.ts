@@ -23,11 +23,12 @@ export async function GET() {
         proxy: 'SOCKS5 via Fixie (century.usefixie.com:1080)',
       },
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
     return NextResponse.json(
       {
         success: false,
-        error: err.message ?? 'unknown',
+        error: message,
         environment: process.env.VERCEL ? 'vercel' : 'local',
       },
       { status: 500 },
