@@ -6,7 +6,7 @@ export async function GET() {
     const result = await db.execute(sql`SELECT version()`);
     return Response.json({ 
       success: true, 
-      version: result[0],
+      version: result.rows[0],
       environment: process.env.NODE_ENV 
     });
   } catch (error: unknown) {
