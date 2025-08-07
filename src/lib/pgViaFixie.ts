@@ -29,6 +29,7 @@ export async function connectPgViaFixie() {
       const s = socket as Socket;
       type ConnectFn = typeof s.connect;
       const noopConnect = ((..._args: Parameters<ConnectFn>): Socket => {
+        void _args; // silence unused param
         setImmediate(() => s.emit('connect'));
         return s;
       }) as ConnectFn;
