@@ -9,11 +9,12 @@ export async function GET() {
       version: result[0],
       environment: process.env.NODE_ENV 
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Database connection error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return Response.json({ 
       success: false, 
-      error: error.message,
+      error: errorMessage,
       environment: process.env.NODE_ENV 
     }, { status: 500 });
   }
