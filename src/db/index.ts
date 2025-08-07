@@ -1,6 +1,5 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
-import { SocksProxyAgent } from 'socks-proxy-agent';
 import * as schema from './schema';
 
 // Configuración para desarrollo vs producción
@@ -9,10 +8,9 @@ const isProduction = process.env.NODE_ENV === 'production';
 let pool: Pool;
 
 if (isProduction) {
-  // Para producción, configurar proxy SOCKS
-  const proxyAgent = new SocksProxyAgent(
-    'socks5://fixie:hwAXP1CEv6zp2P4@century.usefixie.com:1080'
-  );
+  // Configurar variables de entorno para el proxy SOCKS como lo haría proxychains4
+  process.env.http_proxy = 'socks5://fixie:hwAXP1CEv6zp2P4@44.219.233.55:1080';
+  process.env.https_proxy = 'socks5://fixie:hwAXP1CEv6zp2P4@44.219.233.55:1080';
 
   pool = new Pool({
     host: '34.41.173.45',
@@ -22,11 +20,8 @@ if (isProduction) {
     password: 'sg*?esXL}>z9wO4f',
     max: 1,
     ssl: false,
-    // Configurar el proxy para las conexiones TCP
     connectionTimeoutMillis: 60000,
     idleTimeoutMillis: 20000,
-    // @ts-expect-error - pg types don't include agent option but it works
-    agent: proxyAgent,
   });
 } else {
   // Desarrollo sin proxy
