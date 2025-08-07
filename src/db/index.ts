@@ -3,12 +3,14 @@ import { Pool } from 'pg';
 import * as schema from './schema';
 
 // Configuración para desarrollo vs producción
-const isProduction = process.env.NODE_ENV === 'production';
+// En Vercel, usar VERCEL_ENV para detectar producción
+const isProduction = process.env.VERCEL_ENV === 'production' || process.env.NODE_ENV === 'production';
+const isVercel = !!process.env.VERCEL;
 
 let pool: Pool;
 
-if (isProduction) {
-  // Configurar variables de entorno para el proxy SOCKS como lo haría proxychains4
+if (isVercel && isProduction) {
+  // En Vercel producción: usar proxy SOCKS para BD externa
   process.env.http_proxy = 'socks5://fixie:hwAXP1CEv6zp2P4@44.219.233.55:1080';
   process.env.https_proxy = 'socks5://fixie:hwAXP1CEv6zp2P4@44.219.233.55:1080';
 
@@ -24,7 +26,7 @@ if (isProduction) {
     idleTimeoutMillis: 20000,
   });
 } else {
-  // Desarrollo sin proxy
+  // Desarrollo local sin proxy
   pool = new Pool({
     host: process.env.DB_HOST || '100.66.76.2',
     port: parseInt(process.env.DB_PORT || '5432'),

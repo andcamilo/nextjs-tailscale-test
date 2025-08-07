@@ -7,7 +7,13 @@ export async function GET() {
     return Response.json({ 
       success: true, 
       version: result.rows[0],
-      environment: process.env.NODE_ENV 
+      environment: process.env.NODE_ENV,
+      vercel_env: process.env.VERCEL_ENV,
+      is_vercel: !!process.env.VERCEL,
+      proxy_config: {
+        http_proxy: process.env.http_proxy,
+        https_proxy: process.env.https_proxy
+      }
     });
   } catch (error: unknown) {
     console.error('Database connection error:', error);
